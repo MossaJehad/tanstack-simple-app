@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import { createServerFn, useServerFn } from '@tanstack/react-start';
 import { db } from '../db';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { ListTodoIcon, Plus } from 'lucide-react';
+import { EditIcon, ListTodoIcon, Plus, TrashIcon } from 'lucide-react';
 import {
 	Empty,
 	EmptyContent,
@@ -12,6 +12,21 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from '@/components/ui/empty';
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { Items } from '@/lib/interface';
+import z from 'zod';
+import { tanstack } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { useState } from 'react';
 
 const serverLoader = createServerFn({ method: 'GET' }).handler(() => {
 	return db.query.tanstack.findMany();
@@ -24,13 +39,6 @@ export const Route = createFileRoute('/')({
 	},
 });
 
-interface Items {
-	id: string;
-	name: string;
-	isDone: boolean;
-	createdAt: string;
-	updatedAt: string;
-}
 
 function App() {
 	const data = Route.useLoaderData() as Items[];
@@ -87,4 +95,110 @@ function TodoListTable({ items }: { items: Items[] }) {
 			</Empty>
 		);
 	}
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Status</TableHead>
+					<TableHead>Name</TableHead>
+					<TableHead>Created At</TableHead>
+					<TableHead>Updated At</TableHead>
+					<TableHead>Actions</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{items.map((item) => (
+					<TodoTableRow key={item.id} item={item} />
+				))}
+			</TableBody>
+		</Table>
+	);
+}
+
+const deleteFn = createServerFn({ method: 'POST' })
+	.inputValidator(z.object({ id: z.string().min(1) }))
+	.handler(async ({ data }) => {
+		await db.delete(tanstack).where(eq(tanstack.id, data.id));
+		throw redirect({ to: '/' });
+	});
+
+const toggleFn = createServerFn({ method: 'POST' })
+	.inputValidator(z.object({ isDone: z.boolean(), id: z.string().min(1) }))
+	.handler(async ({ data }) => {
+		await db.update(tanstack).set({ isDone: !data.isDone }).where(eq(tanstack.id, data.id));
+		throw redirect({ to: '/' });
+	});
+
+function TodoTableRow({ item }: { item: Items }) {
+	const deleteServerFn = useServerFn(deleteFn);
+	const toggleServerFn = useServerFn(toggleFn);
+	const [isCurrent, setIsCurrent] = useState(item.isDone);
+	return (
+		<TableRow>
+			<TableCell>
+				<Checkbox className='cursor-pointer' checked={isCurrent} onCheckedChange={() => {
+					setIsCurrent(!isCurrent);
+					toggleServerFn({ data: { id: item.id, isDone: item.isDone } })
+				}} />
+			</TableCell>
+			<TableCell
+				className={cn(
+					'font-medium',
+					isCurrent && 'line-through text-muted-foreground',
+				)}
+			>
+				{item.name}
+			</TableCell>
+			<TableCell
+				className={cn(
+					'font-medium',
+					isCurrent && 'line-through text-muted-foreground',
+				)}
+			>
+				{formatDate(item.createdAt)}
+			</TableCell>
+			<TableCell
+				className={cn(
+					'font-medium',
+					isCurrent && 'line-through text-muted-foreground',
+				)}
+			>
+				{formatDate(item.updatedAt)}
+			</TableCell>
+			<TableCell>
+				<Button
+					asChild
+					variant="ghost"
+					size="icon-sm"
+					className="text-muted-foreground cursor-pointer"
+				>
+					<Link
+						to="/todos/$id/edit"
+						params={{
+							id: item.id,
+						}}
+					>
+						<EditIcon />
+					</Link>
+				</Button>
+				<Button
+					asChild
+					variant="ghost"
+					size="icon-sm"
+					className="text-muted-foreground cursor-pointer hover:bg-red-200"
+					onClick={() => deleteServerFn({ data: { id: item.id } })}
+				>
+					<Link to="/">
+						<TrashIcon />
+					</Link>
+				</Button>
+			</TableCell>
+		</TableRow>
+	);
+}
+
+function formatDate(date: string | Date) {
+	return new Intl.DateTimeFormat('en-US', {
+		dateStyle: 'short',
+	}).format(new Date(date));
 }
