@@ -8,61 +8,79 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as rootRouteImport } from './routes/__root';
+import { Route as IndexRouteImport } from './routes/index';
+import { Route as TodosNewIndexRouteImport } from './routes/todos/new/index';
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: '/',
+	path: '/',
+	getParentRoute: () => rootRouteImport,
+} as any);
+const TodosNewIndexRoute = TodosNewIndexRouteImport.update({
+	id: '/todos/new/',
+	path: '/todos/new/',
+	getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+	'/': typeof IndexRoute;
+	'/todos/new': typeof TodosNewIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+	'/': typeof IndexRoute;
+	'/todos/new': typeof TodosNewIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+	__root__: typeof rootRouteImport;
+	'/': typeof IndexRoute;
+	'/todos/new/': typeof TodosNewIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath;
+	fullPaths: '/' | '/todos/new';
+	fileRoutesByTo: FileRoutesByTo;
+	to: '/' | '/todos/new';
+	id: '__root__' | '/' | '/todos/new/';
+	fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+	IndexRoute: typeof IndexRoute;
+	TodosNewIndexRoute: typeof TodosNewIndexRoute;
 }
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
+	interface FileRoutesByPath {
+		'/': {
+			id: '/';
+			path: '/';
+			fullPath: '/';
+			preLoaderRoute: typeof IndexRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		'/todos/new/': {
+			id: '/todos/new/';
+			path: '/todos/new';
+			fullPath: '/todos/new';
+			preLoaderRoute: typeof TodosNewIndexRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+	}
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-}
+	IndexRoute: IndexRoute,
+	TodosNewIndexRoute: TodosNewIndexRoute,
+};
 export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { getRouter } from './router.tsx';
+import type { createStart } from '@tanstack/react-start';
 declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
+	interface Register {
+		ssr: true;
+		router: Awaited<ReturnType<typeof getRouter>>;
+	}
 }
