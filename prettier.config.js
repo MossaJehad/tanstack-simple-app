@@ -1,10 +1,19 @@
-//  @ts-check
-
 /** @type {import('prettier').Config} */
 const config = {
-	semi: false,
+	tabWidth: 4,
+	semi: true,
 	singleQuote: true,
-	trailingComma: 'all',
-}
+	printWidth: 80,
+	useTabs: true,
+	overrides: [
+		{
+			files: ['*.yml', '*.yaml'],
+			options: {
+				tabWidth: 4,
+				useTabs: true,
+			},
+		},
+	],
+};
 
-export default config
+export default config;
