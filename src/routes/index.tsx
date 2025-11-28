@@ -39,7 +39,6 @@ export const Route = createFileRoute('/')({
 	},
 });
 
-
 function App() {
 	const data = Route.useLoaderData() as Items[];
 
@@ -125,7 +124,10 @@ const deleteFn = createServerFn({ method: 'POST' })
 const toggleFn = createServerFn({ method: 'POST' })
 	.inputValidator(z.object({ isDone: z.boolean(), id: z.string().min(1) }))
 	.handler(async ({ data }) => {
-		await db.update(tanstack).set({ isDone: !data.isDone }).where(eq(tanstack.id, data.id));
+		await db
+			.update(tanstack)
+			.set({ isDone: !data.isDone })
+			.where(eq(tanstack.id, data.id));
 		throw redirect({ to: '/' });
 	});
 
@@ -136,10 +138,16 @@ function TodoTableRow({ item }: { item: Items }) {
 	return (
 		<TableRow>
 			<TableCell>
-				<Checkbox className='cursor-pointer' checked={isCurrent} onCheckedChange={() => {
-					setIsCurrent(!isCurrent);
-					toggleServerFn({ data: { id: item.id, isDone: item.isDone } })
-				}} />
+				<Checkbox
+					className="cursor-pointer"
+					checked={isCurrent}
+					onCheckedChange={() => {
+						setIsCurrent(!isCurrent);
+						toggleServerFn({
+							data: { id: item.id, isDone: item.isDone },
+						});
+					}}
+				/>
 			</TableCell>
 			<TableCell
 				className={cn(

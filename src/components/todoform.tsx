@@ -30,7 +30,7 @@ const updateTodo = createServerFn({ method: 'POST' })
 		}),
 	)
 	.handler(async ({ data }) => {
-		await db.update(tanstack).set(data).where(eq(tanstack.id, data.id))
+		await db.update(tanstack).set(data).where(eq(tanstack.id, data.id));
 		throw redirect({ to: '/' });
 	});
 
@@ -47,7 +47,9 @@ export default function TodoForm({ todo }: { todo?: Items }) {
 		if (todo == null)
 			await addTodoFn({ data: { name: nameRef.current?.value } });
 		else
-			await updateTodoFn({ data: { id: todo.id, name: nameRef.current?.value } })
+			await updateTodoFn({
+				data: { id: todo.id, name: nameRef.current?.value },
+			});
 		setIsLoading(false);
 	}
 
