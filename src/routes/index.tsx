@@ -4,7 +4,14 @@ import { db } from '../db';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { ListTodoIcon, Plus } from 'lucide-react';
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from '@/components/ui/empty';
 
 const serverLoader = createServerFn({ method: 'GET' }).handler(() => {
 	return db.query.tanstack.findMany();
@@ -59,7 +66,7 @@ function App() {
 function TodoListTable({ items }: { items: Items[] }) {
 	if (items.length === 0) {
 		return (
-			<Empty className='border border-dotted border-gray-200 p-8'>
+			<Empty className="border border-dotted border-gray-200 p-8">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">
 						<ListTodoIcon />
