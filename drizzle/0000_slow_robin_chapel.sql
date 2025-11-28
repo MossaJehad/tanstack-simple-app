@@ -1,4 +1,4 @@
-CREATE TABLE "todos" (
+CREATE TABLE "tanstack" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"is_done" boolean DEFAULT false NOT NULL,
