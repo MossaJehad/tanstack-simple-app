@@ -15,7 +15,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 
 const loaderFn = createServerFn({ method: 'GET' })
-	.inputValidator((data: { id: string }) => data)
+	.validator((data: { id: string }) => data)
 	.handler(async ({ data }) => {
 		const todo = await db.query.tanstack.findFirst({
 			where: eq(tanstack.id, data.id),
