@@ -115,14 +115,14 @@ function TodoListTable({ items }: { items: Items[] }) {
 }
 
 const deleteFn = createServerFn({ method: 'POST' })
-	.inputValidator(z.object({ id: z.string().min(1) }))
+	.validator(z.object({ id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		await db.delete(tanstack).where(eq(tanstack.id, data.id));
 		throw redirect({ to: '/' });
 	});
 
 const toggleFn = createServerFn({ method: 'POST' })
-	.inputValidator(z.object({ isDone: z.boolean(), id: z.string().min(1) }))
+	.validator(z.object({ isDone: z.boolean(), id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		await db
 			.update(tanstack)

@@ -12,7 +12,7 @@ import { Items } from '../lib/interface';
 import { eq } from 'drizzle-orm';
 
 const addTodo = createServerFn({ method: 'POST' })
-	.inputValidator(
+	.validator(
 		z.object({
 			name: z.string().min(1, 'Name is required'),
 		}),
@@ -23,7 +23,7 @@ const addTodo = createServerFn({ method: 'POST' })
 	});
 
 const updateTodo = createServerFn({ method: 'POST' })
-	.inputValidator(
+	.validator(
 		z.object({
 			id: z.string().min(1),
 			name: z.string().min(1, 'Name is required'),
